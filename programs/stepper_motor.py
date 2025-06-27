@@ -9,7 +9,7 @@ class TMC2209:
     Class to control a stepper motor driver (TMC2209) using step and direction pins.
     """
 
-    def __init__(self, step_pin: Pin, dir_pin: Pin, step_degrees: float = 1.8) -> None:
+    def __init__(self, step_pin: Pin, dir_pin: Pin, step_degrees: float = 1.8, micro_step: int = 8) -> None:
         """
         Initialize the TMC2209 stepper driver with step and direction pins.
 
@@ -17,11 +17,15 @@ class TMC2209:
             step_pin (Pin): The microcontroller pin connected to the STEP input.
             dir_pin (Pin): The microcontroller pin connected to the DIR input.
             step_degrees (float, optional): Degrees per step of the motor. Default is 1.8 degrees.
+            micro_step (int, optional): Micro-stepping factor. Default is 8 (1/8 micro-stepping).
         """
         self.step_pin = DigitalInOut(step_pin)
         self.dir_pin = DigitalInOut(dir_pin)
         self.step_pin.direction = Direction.OUTPUT  # Set step pin as output
         self.dir_pin.direction = Direction.OUTPUT   # Set direction pin as output
+
+        self.step_degrees = step_degrees  # Store the degrees per step
+        self.micro_step = micro_step  # Store the micro-stepping factor
 
     class MotorDirection(Enum):
         """
@@ -42,9 +46,9 @@ class TMC2209:
             ValueError: If an invalid direction is provided.
         """
         # Set the direction pin based on the desired direction
-        if direction == self.Direction.CLOCKWISE:
+        if direction == self.MotorDirection.CLOCKWISE:
             self.dir_pin.value = True
-        elif direction == self.Direction.COUNTERCLOCKWISE:
+        elif direction == self.MotorDirection.COUNTERCLOCKWISE:
             self.dir_pin.value = False
         else:
             raise ValueError("Invalid direction")
@@ -81,6 +85,9 @@ class RubikCubeController:
           d_motor (TMC2209): Stepper motor for the down face.
           alg_move_delay (float): Delay between moves in the algorithm execution.
       """
+
+      self.alg_move_delay = alg_move_delay
+
       self.motors = {
           'F': f_motor,
           'B': b_motor,
