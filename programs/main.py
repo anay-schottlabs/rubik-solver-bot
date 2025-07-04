@@ -1,5 +1,7 @@
-import kociemba
+from kociemba import solve # ruibk's cube solving module
+from vision import get_cube_state # module for computer vision
 
-actions = kociemba.solve('DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD')
+cube = get_cube_state()
+actions = solve(cube)
 
 print(actions)
