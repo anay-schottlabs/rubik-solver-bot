@@ -1,0 +1,19 @@
+#include <controller_funcs.h>
+
+// Define some macros
+
+#define BAUD_RATE 9600
+#define MOTOR1_FACE "U"
+#define MOTOR2_FACE "F"
+#define MOTOR3_FACE "L"
+
+void setup() {
+  controllerSetup(BAUD_RATE,
+                  MOTOR1_FACE,
+                  MOTOR2_FACE,
+                  MOTOR3_FACE);
+}
+
+void loop() {
+  controllerLoop();
+}
