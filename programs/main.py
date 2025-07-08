@@ -1,7 +1,5 @@
 from kociemba import solve # ruibk's cube solving module
 from vision import get_cube_state # module for computer vision
+from arduino_comm import perform_rotation # module for communicating with the arduinos
 
-cube = get_cube_state()
-actions = solve(cube)
-
-print(actions)
+perform_rotation("U")

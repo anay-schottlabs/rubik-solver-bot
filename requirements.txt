@@ -1,2 +1,4 @@
 kociemba==1.2.1
 opencv-python==4.11.0.86
+pyserial==3.5
+python-dotenv==1.1.1
