@@ -2,7 +2,7 @@
 
 // Define some macros
 
-#define BAUD_RATE 115200
+#define BAUD_RATE 9600
 #define MOTOR1_FACE "U"
 #define MOTOR2_FACE "F"
 #define MOTOR3_FACE "L"
