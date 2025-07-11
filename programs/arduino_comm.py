@@ -10,7 +10,7 @@ import serial
 # This is because only the arduino that turns the face will respond
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv(override=True)
 
 # Determine the serial ports for the arduinos
 ARDUINO1_PORT = getenv("ARDUINO1_PORT")
@@ -18,7 +18,7 @@ ARDUINO2_PORT = getenv("ARDUINO2_PORT")
 
 # Both arduinos are on 9600 baud with a timeout of 1 second
 ARDUINO1 = serial.Serial(ARDUINO1_PORT, 9600, timeout=1)
-# ARDUINO2 = serial.Serial(ARDUINO2_PORT, 9600, timeout=1
+ARDUINO2 = serial.Serial(ARDUINO2_PORT, 9600, timeout=1)
 
 def perform_rotation(move_notation: str) -> None:
     """
@@ -36,11 +36,11 @@ def perform_rotation(move_notation: str) -> None:
     while True:
         # Write the move notation to both arduinos
         ARDUINO1.write(move_notation.encode())
-        # ARDUINO2.write(move_notation.encode())
+        ARDUINO2.write(move_notation.encode())
 
         # Read the response from the arduinos
         line1 = ARDUINO1.readline().decode().strip()
-        line2 = None # ARDUINO2.readline().decode().strip()
+        line2 = ARDUINO2.readline().decode().strip()
 
         # Check if the arduinos responded with a valid message
         if line1 == move_notation or line2 == move_notation:
@@ -70,4 +70,4 @@ def close_connections() -> None:
     This should be called when communication is finished to free system resources.
     """
     ARDUINO1.close()
-    # ARDUINO2.close()
+    ARDUINO2.close()

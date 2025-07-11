@@ -21,22 +21,24 @@ void controllerSetup(unsigned int baudRate, String motor1Face, String motor2Face
 void controllerLoop() {
     if (Serial.available()) {
         String cube_move = Serial.readString();
-    	Serial.println(cube_move); // Echo the received move for debugging
 
-    	// // Check if this arduino is the one that should perform the move
-    	// if (cube_move.startsWith(motor1Face)
-        // 	|| cube_move.startsWith(motor2Face)
-        // 	|| cube_move.startsWith(motor3Face)) {
+    	// Check if this arduino is the one that should perform the move
+    	if (cube_move.startsWith(motor1Face)
+        	|| cube_move.startsWith(motor2Face)
+        	|| cube_move.startsWith(motor3Face)) {
             
-        //     	digitalWrite(LED_BUILTIN, HIGH); // Turn on the LED to indicate processing
+            	digitalWrite(LED_BUILTIN, HIGH); // Turn on the LED
 
-        //     	// Perform the move (ADD STEPPER MOTOR CODE HERE, for now the code just waits for 2 seconds)
-        //     	delay(2000);
+            	// Perform the move (ADD STEPPER MOTOR CODE HERE)
 
-        //     	digitalWrite(LED_BUILTIN, LOW); // Turn off the LED after processing
+            	// Echo back the received move, this lets the python script know that everything was processed correctly
+            	Serial.println(cube_move);
+    	}
+        else
+        {
+            // If the move is not for this arduino, turn off the LED
+            digitalWrite(LED_BUILTIN, LOW);
+        }
 
-        //     	// Echo back the received move, this lets the python script know that everything was processed correctly
-        //     	Serial.println(cube_move);
-    	// }
     }
 }
