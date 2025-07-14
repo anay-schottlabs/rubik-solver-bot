@@ -35,24 +35,18 @@ def get_cube_state() -> str:
     """
     camera = VideoCapture(0)  # Open the default camera
 
-    try:
-        # 1. Capture the default orientation
-        default_pic = take_picture(camera)
+    # 1. Capture the default orientation
+    default_pic = take_picture(camera)
 
-        # 2. Rotate F and B faces to reveal the back, capture, then reset
-        perform_algorithm("F2 B2")
-        fb_pic = take_picture(camera)
-        perform_algorithm("F2 B2")
+    # 2. Rotate F and B faces to reveal the back, capture, then reset
+    perform_algorithm("F2 B2")
+    fb_pic = take_picture(camera)
+    perform_algorithm("F2 B2")
 
-        # 3. Rotate L and R faces to reveal the back, capture, then reset
-        perform_algorithm("L2 R2")
-        lr_pic = take_picture(camera)
-        perform_algorithm("L2 R2")
-
-    except RuntimeError as e:
-        # If there is an error in capturing the image, print the error and return the solved cube state
-        print(f"Error: {e}")
-        return "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"
+    # 3. Rotate L and R faces to reveal the back, capture, then reset
+    perform_algorithm("L2 R2")
+    lr_pic = take_picture(camera)
+    perform_algorithm("L2 R2")
 
     camera.release()  # Release the camera resource
 
