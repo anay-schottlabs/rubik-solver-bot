@@ -1,7 +1,7 @@
-from cv2 import VideoCapture, imread
+from cv2 import VideoCapture
 from cv2.typing import MatLike
 from math import dist
-# from arduino_comm import perform_algorithm
+from arduino_comm import perform_algorithm
 
 # the pixel locations on the image where cube piece colors are located
 # center pieces are omitted since they are covered by the rotating shafts
@@ -31,7 +31,7 @@ image_points = [
     [479,389], # 20, front face
     [394,471], # 21, front face
     [351,476], # 22, front face
-    [328,453]  # 23, front
+    [328,453]  # 23, front face
 ]
 
 # stuff for dealing with the cube state mapping
@@ -55,8 +55,12 @@ COLORS = {                 # rgb color that roughly corresponds to the cube piec
 DEFAULT_MAPPING = ["U3", "U6", "U9", "U8", "U7", "U4", "U1", "U2",
                    "L1", "L2", "L3", "L6", "L9", "L8", "L7", "L4",
                    "F1", "F2", "F3", "F6", "F9", "F8", "F7", "F4"]
-FB_MAPPING = []
-LR_MAPPINGd = []
+FB_MAPPING = ["D7", "X", "D1", "D2", "D3", "X", "D9", "D8",
+              "R9", "X", "R7", "R4", "R1", "X", "R3", "R6",
+              "X", "X", "X", "X", "X", "X", "X", "X"]
+LR_MAPPING = ["D3", "D6", "D9", "X", "D7", "D4", "D1", "X",
+              "X", "X", "X", "X", "X", "X", "X", "X",
+              "B9", "X", "B7", "B4", "B1", "X", "B3", "B6"]
 
 def take_picture(camera: VideoCapture) -> MatLike:
     """
@@ -135,45 +139,51 @@ def map_faces_to_cube_state(cube_state: str, three_face_colors: list[str], mappi
 
 def get_cube_state() -> str:
     """
-    Capture images of the Rubik's Cube in different orientations to determine its state.
+    Capture images of the Rubik's Cube in different orientations and reconstruct its full state.
 
-    This placeholder function simulates the vision processing workflow:
-      1. Takes a picture of the default cube orientation.
-      2. Rotates the F and B faces 180° to reveal the back, takes a picture, then resets.
-      3. Rotates the L and R faces 180° to reveal the back, takes a picture, then resets.
-    The actual vision processing logic to extract the cube state from images is not implemented yet.
+    This function performs the following steps:
+      1. Captures an image of the default cube orientation and maps the visible pieces.
+      2. Rotates the F and B faces 180° to expose the down and right faces, captures an image, maps the new visible pieces, then resets orientation.
+      3. Rotates the L and R faces 180° to expose the down and back faces, captures an image, maps the new visible pieces, then resets orientation.
+      4. Combines all detected colors into a single cube state string in standard piece order.
+
+    The function uses predefined pixel locations and color mappings to identify each piece's color.
+    It communicates with the robot to rotate the cube as needed and updates the cube state after each image.
 
     Returns:
-        str: A string representing the detected cube state (currently hardcoded).
+        str: A string representing the detected cube state, with each character corresponding to a piece color in PIECE_ORDER.
     """
     camera = VideoCapture(0)  # Open the default camera
 
-    # 1. Capture the default orientation
-    default_pic = take_picture(camera)
+    cube_state = DEFAULT_CUBE_STR  # Start with the default cube state string
 
-    # 2. Rotate F and B faces to reveal the back, capture, then reset
-    perform_algorithm("F2 B2")
-    fb_pic = take_picture(camera)
+    # 1. Capture the default orientation, then populate cube state
+    default_pic = take_picture(camera=camera)
+    colors = get_image_point_colors(image=default_pic)  # Get the colors of the three visible faces
+    cube_state = map_faces_to_cube_state(cube_state=cube_state, three_face_colors=colors, mapping=DEFAULT_MAPPING)  # Map the colors to the cube state
+
+    # 2. Rotate F and B faces to reveal the back, capture, then reset and populate cube state
     perform_algorithm("F2 B2")
 
-    # 3. Rotate L and R faces to reveal the back, capture, then reset
+    fb_pic = take_picture(camera=camera)
+    colors = get_image_point_colors(image=fb_pic)  # Get the colors of the new pieces after rotation
+    cube_state = map_faces_to_cube_state(cube_state=cube_state, three_face_colors=colors, mapping=FB_MAPPING)  # Map the colors to the cube state
+
+    perform_algorithm("F2 B2") # reset the cube to the default orientation
+
+    # 3. Rotate L and R faces to reveal the back, capture, then reset and populate cube state
     perform_algorithm("L2 R2")
-    lr_pic = take_picture(camera)
-    perform_algorithm("L2 R2")
+
+    lr_pic = take_picture(camera=camera)
+    colors = get_image_point_colors(image=lr_pic)  # Get the colors of the new pieces after rotation
+    cube_state = map_faces_to_cube_state(cube_state=cube_state, three_face_colors=colors, mapping=LR_MAPPING)  # Map the colors to the cube state
+
+    perform_algorithm("L2 R2") # reset the cube to the default orientation
 
     camera.release()  # Release the camera resource
 
-    # TODO: Implement vision processing to analyze captured images and return the actual cube state.
-    # For now, return a hardcoded cube state string for testing.
-    return "DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD"
+    return cube_state  # Return the fully populated cube state string
 
 if __name__ == "__main__":
     # If run directly, print the detected (placeholder) cube state
-    # print(get_cube_state())
-    three_face_colors = get_image_point_colors(image=imread("programs/test_image.jpg"))  # Example usage with a test image
-    cube_state = map_faces_to_cube_state(cube_state=DEFAULT_CUBE_STR,
-                                         three_face_colors=three_face_colors,
-                                         mapping=["U3", "U6", "U9", "U8", "U7", "U4", "U1", "U2",
-                                                  "L1", "L2", "L3", "L6", "L9", "L8", "L7", "L4",
-                                                  "F1", "F2", "F3", "F6", "F9", "F8", "F7", "F4"])
-    print(cube_state)
+    print(get_cube_state())
