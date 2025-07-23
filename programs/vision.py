@@ -58,9 +58,12 @@ DEFAULT_MAPPING = ["U3", "U6", "U9", "U8", "U7", "U4", "U1", "U2",
 FB_MAPPING = ["D7", "X", "D1", "D2", "D3", "X", "D9", "D8",
               "R9", "X", "R7", "R4", "R1", "X", "R3", "R6",
               "X", "X", "X", "X", "X", "X", "X", "X"]
-LR_MAPPING = ["D3", "D6", "D9", "X", "D7", "D4", "D1", "X",
+LR_MAPPING = ["X", "D6", "X", "X", "X", "D4", "X", "X",
               "X", "X", "X", "X", "X", "X", "X", "X",
               "B9", "X", "B7", "B4", "B1", "X", "B3", "B6"]
+UD_MAPPING = ["X", "X", "X", "X", "X", "X", "X", "X",
+              "X", "R2", "X", "X", "X", "R8", "X", "X",
+              "X", "B2", "X", "x", "x", "B8", "X", "X"]
 
 def take_picture(camera: VideoCapture) -> MatLike:
     """
@@ -145,7 +148,8 @@ def get_cube_state() -> str:
       1. Captures an image of the default cube orientation and maps the visible pieces.
       2. Rotates the F and B faces 180° to expose the down and right faces, captures an image, maps the new visible pieces, then resets orientation.
       3. Rotates the L and R faces 180° to expose the down and back faces, captures an image, maps the new visible pieces, then resets orientation.
-      4. Combines all detected colors into a single cube state string in standard piece order.
+      4. Rotates the U and D faces 180° to expose the right and back faces, captures an image, maps the new visible pieces, then resets orientation.
+      5. Combines all detected colors into a single cube state string in standard piece order.
 
     The function uses predefined pixel locations and color mappings to identify each piece's color.
     It communicates with the robot to rotate the cube as needed and updates the cube state after each image.
@@ -179,6 +183,15 @@ def get_cube_state() -> str:
     cube_state = map_faces_to_cube_state(cube_state=cube_state, three_face_colors=colors, mapping=LR_MAPPING)  # Map the colors to the cube state
 
     perform_algorithm("L2 R2") # reset the cube to the default orientation
+
+    # 4. Rotate U and D faces to reveal the back, capture, then reset and populate cube state
+    perform_algorithm("U2 D2")
+
+    ud_pic = take_picture(camera=camera)
+    colors = get_image_point_colors(image=ud_pic)  # Get the colors of the new pieces after rotation
+    cube_state = map_faces_to_cube_state(cube_state=cube_state, three_face_colors=colors, mapping=UD_MAPPING)  # Map the colors to the cube state
+
+    perform_algorithm("U2 D2") # reset the cube to the default orientation
 
     camera.release()  # Release the camera resource
 
