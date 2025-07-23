@@ -45,12 +45,12 @@ PIECE_ORDER = [                         # this makes it much easier to find the 
     "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9" # back face
 ]
 COLORS = {                 # rgb color that roughly corresponds to the cube piece colors
-    (209, 190, 183): "U",  # up face, white
-    (255, 128, 0): "R",    # right face, orange
+    (235, 235, 235): "U",  # up face, white
+    (255, 195, 160): "R",  # right face, orange
     (24, 29, 61): "F",     # front face, blue
-    (255, 255, 0): "D",    # down face, yellow
-    (219, 101, 106): "L",  # left face, red
-    (0, 255, 0): "B"       # back face, green
+    (220, 240, 175): "D",  # down face, yellow
+    (255, 125, 100): "L",  # left face, red
+    (0, 85, 30): "B"       # back face, green
 }
 DEFAULT_MAPPING = ["U3", "U6", "U9", "U8", "U7", "U4", "U1", "U2",
                    "L1", "L2", "L3", "L6", "L9", "L8", "L7", "L4",
