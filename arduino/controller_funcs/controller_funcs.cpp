@@ -6,12 +6,17 @@ String motor1Face;
 String motor2Face;
 String motor3Face;
 unsigned int stepDelay;
+
+// Pin definitions for stepper motors
 const int StepX = 2;
 const int DirX = 5;
 const int StepY = 3;
 const int DirY = 6;
 const int StepZ = 4;
 const int DirZ = 7;
+
+// Variable to prevent moves to be executed multiple times
+String lastMove;
 
 void controllerSetup(unsigned int baudRate, String motor1Face, String motor2Face, String motor3Face, unsigned int stepDelay) {
     ::baudRate = baudRate;
@@ -37,6 +42,12 @@ void controllerSetup(unsigned int baudRate, String motor1Face, String motor2Face
 void controllerLoop() {
     if (Serial.available()) {
         String cube_move = Serial.readString();
+
+        if (cube_move == lastMove) {
+            return;
+        }
+
+        lastMove = cube_move; // Store the last move
 
     	// Check if this arduino is the one that should perform the move
     	if (cube_move.startsWith(motor1Face)
