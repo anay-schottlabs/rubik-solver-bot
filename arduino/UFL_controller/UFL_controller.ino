@@ -21,6 +21,7 @@
 #define MOTOR1_FACE "U"
 #define MOTOR2_FACE "F"
 #define MOTOR3_FACE "L"
+#define STEP_DELAY 1000
 
 // Main program methods are handled by the library
 
@@ -28,7 +29,8 @@ void setup() {
   controllerSetup(BAUD_RATE,
                   MOTOR1_FACE,
                   MOTOR2_FACE,
-                  MOTOR3_FACE);
+                  MOTOR3_FACE,
+                  STEP_DELAY);
 }
 
 void loop() {

@@ -4,9 +4,10 @@
 #include <Arduino.h>
 
 void controllerSetup(unsigned int baudRate,
-                      String motor1Face,
-                      String motor2Face,
-                      String motor3Face);
+                     String motor1Face,
+                     String motor2Face,
+                     String motor3Face,
+                     unsigned int stepDelay);
 
 void controllerLoop();
 
