@@ -72,13 +72,14 @@ def close_connections() -> None:
     ARDUINO1.close()
     ARDUINO2.close()
 
-# If this program is being run directly, take inputs and perform the algorithm
+# If this program is being run directly, take inputs and perform algorithms in a loop
 if __name__ == "__main__":
     try:
-        alg_str = input("Enter an algorithm (example: U R' L2 F2' B D2): ")
-        perform_algorithm(alg_str)
+        while True:
+            alg_str = input("Enter an algorithm (example: U R' L2 F2' B D2): ")
+            perform_algorithm(alg_str)
     except KeyboardInterrupt:
-        print("Program interrupted by user.")
+        print("\nProgram interrupted by user.")
     finally:
         print("Closing connections...")
         close_connections()
