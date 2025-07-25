@@ -173,7 +173,9 @@ def get_cube_state() -> str:
     colors = get_image_point_colors(image=fb_pic)  # Get the colors of the new pieces after rotation
     cube_state = map_faces_to_cube_state(cube_state=cube_state, three_face_colors=colors, mapping=FB_MAPPING)  # Map the colors to the cube state
 
-    perform_algorithm("F2 B2") # reset the cube to the default orientation
+    # reset the cube to the default orientation
+    # U U' is used to clear out any slight misalignment that may have occurred
+    perform_algorithm("U U' F2 B2")
 
     # 3. Rotate L and R faces to reveal the back, capture, then reset and populate cube state
     perform_algorithm("L2 R2")
@@ -182,7 +184,9 @@ def get_cube_state() -> str:
     colors = get_image_point_colors(image=lr_pic)  # Get the colors of the new pieces after rotation
     cube_state = map_faces_to_cube_state(cube_state=cube_state, three_face_colors=colors, mapping=LR_MAPPING)  # Map the colors to the cube state
 
-    perform_algorithm("L2 R2") # reset the cube to the default orientation
+    # reset the cube to the default orientation
+    # U U' is used to clear out any slight misalignment that may have occurred
+    perform_algorithm("U U' L2 R2")
 
     # 4. Rotate U and D faces to reveal the back, capture, then reset and populate cube state
     perform_algorithm("U2 D2")
@@ -191,7 +195,9 @@ def get_cube_state() -> str:
     colors = get_image_point_colors(image=ud_pic)  # Get the colors of the new pieces after rotation
     cube_state = map_faces_to_cube_state(cube_state=cube_state, three_face_colors=colors, mapping=UD_MAPPING)  # Map the colors to the cube state
 
-    perform_algorithm("U2 D2") # reset the cube to the default orientation
+    # reset the cube to the default orientation
+    # R R' is used to clear out any slight misalignment that may have occurred
+    perform_algorithm("R R' U2 D2")
 
     camera.release()  # Release the camera resource
 
