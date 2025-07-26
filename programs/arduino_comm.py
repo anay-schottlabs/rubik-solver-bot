@@ -35,8 +35,8 @@ def perform_rotation(move_notation: str) -> None:
 
     while True:
         # Write the move notation to both arduinos
-        ARDUINO1.write(move_notation.encode())
-        ARDUINO2.write(move_notation.encode())
+        ARDUINO1.write(f"{move_notation}\n".encode())
+        ARDUINO2.write(f"{move_notation}\n".encode())
 
         # Read the response from the arduinos
         line1 = ARDUINO1.readline().decode().strip()

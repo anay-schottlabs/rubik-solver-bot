@@ -41,7 +41,8 @@ void controllerSetup(unsigned int baudRate, String motor1Face, String motor2Face
 
 void controllerLoop() {
     if (Serial.available()) {
-        String cube_move = Serial.readString();
+        String cube_move = Serial.readStringUntil("\n");
+        cube_move.trim(); // Remove any leading or trailing whitespace
 
         if (cube_move == lastMove) {
             return;
