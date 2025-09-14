@@ -15,8 +15,20 @@ const int DirY = 6;
 const int StepZ = 4;
 const int DirZ = 7;
 
+// Pin definitions for reed switches
+const int ReedX = 9;
+const int ReedY = 10;
+const int ReedZ = 11;
+
 // Variable to prevent moves to be executed multiple times
 String lastMove;
+
+void step(int stepPin, int stepDelay) {
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(stepDelay);
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(stepDelay);
+}
 
 void controllerSetup(unsigned int baudRate, String motor1Face, String motor2Face, String motor3Face, unsigned int stepDelay) {
     ::baudRate = baudRate;
@@ -34,6 +46,11 @@ void controllerSetup(unsigned int baudRate, String motor1Face, String motor2Face
     pinMode(DirY,OUTPUT);
     pinMode(StepZ,OUTPUT);
     pinMode(DirZ,OUTPUT);
+
+    // Initialize reed switch pins
+    pinMode(ReedX, INPUT_PULLUP); // Use pull-up resistor for reed switch
+    pinMode(ReedY, INPUT_PULLUP); // Use pull-up resistor for reed switch
+    pinMode(ReedZ, INPUT_PULLUP); // Use pull-up resistor for reed switch
 
     pinMode(LED_BUILTIN, OUTPUT); // Initialize the built-in LED pin
     digitalWrite(LED_BUILTIN, LOW); // Turn off the LED initially
@@ -66,24 +83,37 @@ void controllerLoop() {
                 digitalWrite(DirZ, isClockwise ? HIGH : LOW);
 
                 // determine the number of steps
-                int steps = cube_move.indexOf("2") == -1 ? 50 : 100; // 2x the amount of steps for moves like F2
+                int times = cube_move.indexOf("2") == -1 ? 1 : 2; // 2x the amount of steps for moves like F2
 
                 // determine which motor to move based on the face in the move string
+                // also find the corresponding reed switch pin for homing
                 int stepPin;
+                int reedPin;
+
                 if (cube_move.startsWith(motor1Face)) {
                     stepPin = StepX;
+                    reedPin = ReedX;
                 } else if (cube_move.startsWith(motor2Face)) {
                     stepPin = StepY;
+                    reedPin = ReedY;
                 } else if (cube_move.startsWith(motor3Face)) {
                     stepPin = StepZ;
+                    reedPin = ReedZ;
                 }
+                
+                // If it is a double movement (e.g. F2) repeat the whole thing twice
+                for (int i = 0; i < times; i++) {
+                    // the motor will start in a 90 degree position, so the reed switch will be triggered by default
+                    // rotate until the reed switch is no longer triggered, so that we can wait until the next 90 degree trigger
+                    while (digitalRead(reedPin) == LOW) {
+                        step(stepPin, stepDelay);
+                    }
 
-                // do the steps to move the motor
-                for (int i = 0; i < steps; i++) {
-                    digitalWrite(stepPin,HIGH);
-                    delayMicroseconds(stepDelay);
-                    digitalWrite(stepPin,LOW); 
-                    delayMicroseconds(stepDelay);
+                    // keep moving until the reed switch is triggered again
+                    // once the reed switch is triggered again, the motor has reached 90 degrees (roughly)
+                    while (digitalRead(reedPin) == HIGH) {
+                        step(stepPin, stepDelay);
+                    }
                 }
 
             	// Echo back the received move, this lets the python script know that everything was processed correctly
@@ -94,6 +124,5 @@ void controllerLoop() {
             // If the move is not for this arduino, turn off the LED
             digitalWrite(LED_BUILTIN, LOW);
         }
-
     }
 }

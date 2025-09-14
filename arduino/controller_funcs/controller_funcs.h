@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 
+void step(int stepPin, int stepDelay);
+
 void controllerSetup(unsigned int baudRate,
                      String motor1Face,
                      String motor2Face,
